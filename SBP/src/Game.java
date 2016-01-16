@@ -6,12 +6,14 @@
  * It is intended to implement a Sliding Brick Puzzle
  */
 
+import java.util.*;
 import java.lang.Object;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Scanner;
+
 
 public class Game {
 
@@ -97,30 +99,6 @@ public class Game {
         } catch(Exception e) {
             System.out.println("Error opening file");
         }
-
-
-/*
-        try{
-            //Create object of FileReader
-            FileReader inputFile = new FileReader(path+fileName);
-
-            //Instantiate the BufferedReader Class
-            BufferedReader bufferReader = new BufferedReader(inputFile);
-
-            //Variable to hold the one line data
-            String line;
-            int lineNumber=1;
-
-            // Read file line by line and print on the console
-            while ((line = bufferReader.readLine()) != null)   {
-                System.out.println(line);
-            }
-            //Close the buffer reader
-            bufferReader.close();
-        } catch(Exception e){
-            System.out.println("Error while reading file line by line:" + e.getMessage());
-        }
-*/
         return false;
     }
 
@@ -204,7 +182,15 @@ public class Game {
         return solved;
     }
 
-    public static void allMovesHelp(){}
+    public static void allMovesHelp(Game g1, int piece, List<Move> listOfMoves){
+
+        Move myMove=new Move(2, Move.Direction.DOWN);
+        Move myMove2=new Move(7, Move.Direction.RIGHT);
+
+        listOfMoves.add(myMove);
+        listOfMoves.add(myMove2);
+
+    }
 
     public static void allMoves() {}
 
@@ -212,7 +198,20 @@ public class Game {
 
     public static void applyMoveCloning(){}
 
-    public static void stateEqual(){}
+    public static boolean stateEqual(Game g1, Game g2){
+
+        boolean equal=true;
+
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                if (g1.board[j][i]!=g2.board[j][i]) {
+                    equal=false;
+                }
+            }
+        }
+        return equal;
+
+    }
 
     public static void normalizeState(){}
 
@@ -238,8 +237,15 @@ public class Game {
         else {
             System.out.println("Game level0 not solved");
         }
-        //Game level0Clone=cloneGameState(level0);
-        //outputGameState(level0Clone);
+        Game level0Clone=cloneGameState(level0);
+        outputGameState(level0Clone);
+        if(stateEqual(level0, level0Clone)) {
+            System.out.println("level0 and level0-clone are equal");
+        }
+        else {
+            System.out.println("level0 and level0-clone are NOT equal");
+        }
+
 
         //prettyPrintGameState(level0);
 
@@ -256,7 +262,23 @@ public class Game {
         else {
             System.out.println("Game level0-solved not solved");
         }
-/*
+
+        //System.out.println("Move piece="+myMove.getPiece()+", Direction="+myMove.getDirection());
+
+        List<Move> listOfMoves=new ArrayList<Move>();
+        int piece=0;
+
+        allMovesHelp(level0, piece, listOfMoves);
+
+        ListIterator<Move> itr=listOfMoves.listIterator();
+
+        while (itr.hasNext())
+        {
+            Move newMove=itr.next();
+            System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
+        }
+
+
         // Load SBP-Level1.txt
         Game level1 = new Game("Level 1", 0, 0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
@@ -264,6 +286,13 @@ public class Game {
         loadGameState(level1, myPath, fileName);
         outputGameState(level1);
 
+        if(stateEqual(level0, level1)) {
+            System.out.println("level0 and level1 are equal");
+        }
+        else {
+            System.out.println("level0 and level1 are NOT equal");
+        }
+/*
         // Load SBP-Level2.txt
         Game level2 = new Game("Level 2", 0, 0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
