@@ -155,17 +155,54 @@ public class Game {
 
     public static void main(String args[]) {
 
-        String myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        String fileName="SBP-level0.txt";
-
+        String myPath;
+        String fileName;
         System.out.println("Welcome to the Sliding Brick Puzzle Solver!");
 
-        Game g1 = new Game("Game 1", 0,0);
 
-        loadGameState(g1, myPath, fileName);
-        outputGameState(g1);
+        // Load SBP-Level0.txt
+        Game level0 = new Game("Level 0", 0,0);
+        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        fileName="SBP-level0.txt";
+        loadGameState(level0, myPath, fileName);
+        outputGameState(level0);
 
-        /*System.out.print("Game name is ");
+        // Load SBP-Level0.txt
+        Game level0Solved = new Game("Level 0 Solved", 0,0);
+        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        fileName="SBP-level0-solved.txt";
+        loadGameState(level0Solved, myPath, fileName);
+        outputGameState(level0Solved);
+
+        // Load SBP-Level1.txt
+        Game level1 = new Game("Level 1", 0, 0);
+        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        fileName="SBP-level1.txt";
+        loadGameState(level1, myPath, fileName);
+        outputGameState(level1);
+
+        // Load SBP-Level2.txt
+        Game level2 = new Game("Level 2", 0, 0);
+        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        fileName="SBP-level2.txt";
+        loadGameState(level2, myPath, fileName);
+        outputGameState(level2);
+
+        // Load SBP-Level3.txt
+        Game level3 = new Game("Level 3", 0, 0);
+        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        fileName="SBP-level3.txt";
+        loadGameState(level3, myPath, fileName);
+        outputGameState(level3);
+
+        // Load SBP-test-not-normalized.txt
+        Game notNormalized = new Game("Test Not Normalized", 0, 0);
+        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        fileName="SBP-test-not-normalized.txt";
+        loadGameState(notNormalized, myPath, fileName);
+        outputGameState(notNormalized);
+
+ /*System.out.print("Game name is ");
         System.out.println(g1.getName());
         System.out.print("Game width is ");
         System.out.println(g1.getWidth());
