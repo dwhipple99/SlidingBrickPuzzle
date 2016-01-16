@@ -135,7 +135,57 @@ public class Game {
         }
     }
 
-    public static void cloneGameState(){}
+    public static void prettyPrintGameState(Game g1) {
+        System.out.println("Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")");
+        //System.out.println(g1.w+","+g1.h+",");
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                switch (g1.board[j][i]) {
+                    case 1:
+                        System.out.print("**");
+                        break;
+                    case 0:
+                        System.out.print("  ");
+                        break;
+                    case -1:
+                        System.out.print("--");
+                        break;
+                    case 2:
+                        System.out.print("MM");
+                        break;
+                    default:
+                        System.out.format("%2d", g1.board[j][i]);
+                        break;
+                }
+                    //System.out.print(g1.board[j][i]+",");
+                }
+            System.out.println();
+        }
+    }
+
+    // This function clones the game state
+    public static Game cloneGameState(Game g1){
+
+        System.out.println("Cloning \""+g1.getName()+"\"");
+
+        String newName;
+        newName=g1.getName()+" clone";
+
+        Game clone = new Game(newName, 0,0);
+
+        clone.w=g1.getWidth();
+        clone.h=g1.getHeight();
+        System.out.println("Clone \""+clone.getName()+"\" (Height="+clone.getHeight()+", Width="+clone.getWidth()+")");
+
+        clone.board = new int[clone.w][clone.h];
+
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                clone.board[j][i]=g1.board[j][i];
+            }
+        }
+        return clone;
+    }
 
     public static void gameStateSolved(Game g){}
 
@@ -167,6 +217,11 @@ public class Game {
         loadGameState(level0, myPath, fileName);
         outputGameState(level0);
 
+        Game level0Clone=cloneGameState(level0);
+        outputGameState(level0Clone);
+
+        //prettyPrintGameState(level0);
+/*
         // Load SBP-Level0.txt
         Game level0Solved = new Game("Level 0 Solved", 0,0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
@@ -201,6 +256,8 @@ public class Game {
         fileName="SBP-test-not-normalized.txt";
         loadGameState(notNormalized, myPath, fileName);
         outputGameState(notNormalized);
+        prettyPrintGameState(notNormalized);
+*/
 
  /*System.out.print("Game name is ");
         System.out.println(g1.getName());
