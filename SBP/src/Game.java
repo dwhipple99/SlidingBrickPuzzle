@@ -21,7 +21,7 @@ public class Game {
     int w;   // Width of board
     int h;   // Height of board
 
-    Cellstate[][] board;
+    int[][] board;
 
     // Constructor
     public Game(String name, int width, int height) {
@@ -29,7 +29,7 @@ public class Game {
         gameName=name;
         w=width;
         h=height;
-        /*System.out.print("Initializing Game \"");
+        System.out.print("Initializing Game \"");
         System.out.print(gameName);
         System.out.print("\"");
         System.out.print(", width=");
@@ -37,7 +37,7 @@ public class Game {
         System.out.print(", height=");
         System.out.print(h);
         System.out.println(".");
-        */
+
         }
 
     // Retrieve the width
@@ -71,10 +71,11 @@ public class Game {
                 token=token.replaceAll("\\s", "");
                 switch (tokenNumber) {
                     case 1: g1.w=Integer.parseInt(token);
-                        if (debugFunction) System.out.println("Game Width="+g1.w);
+                        System.out.println("Game Width="+g1.w);
                         break;
                     case 2: g1.h=Integer.parseInt(token);
-                        if (debugFunction) System.out.println("Game Heigth="+g1.h);
+                        System.out.println("Game Heigth="+g1.h);
+                        g1.board = new int[g1.w][g1.h];
                         break;
                     default:
                         if (((tokenNumber-3)%g1.w)==0) {
@@ -82,6 +83,8 @@ public class Game {
                             currentCol=0;
                             if (debugFunction) System.out.println("Row="+currentRow);
                         }
+                        if (debugFunction) System.out.println("Setting Col="+currentCol+", Row="+currentRow+"="+token);
+                        g1.board[currentCol][currentRow]=Integer.parseInt(token);
                         if (debugFunction) System.out.println("Col="+currentCol+", token="+token);
                         currentCol++;
                     break;
@@ -121,7 +124,16 @@ public class Game {
         return false;
     }
 
-    public static void outputGameState() {}
+    public static void outputGameState(Game g1) {
+        System.out.println("Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")");
+        System.out.println(g1.w+","+g1.h+",");
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                System.out.print(g1.board[j][i]+",");
+            }
+            System.out.println();
+        }
+    }
 
     public static void cloneGameState(){}
 
@@ -151,13 +163,16 @@ public class Game {
         Game g1 = new Game("Game 1", 0,0);
 
         loadGameState(g1, myPath, fileName);
+        outputGameState(g1);
 
-        System.out.print("Game name is ");
+        /*System.out.print("Game name is ");
         System.out.println(g1.getName());
         System.out.print("Game width is ");
         System.out.println(g1.getWidth());
         System.out.print("Game heigth is ");
         System.out.println(g1.getHeight());
+*/
+
 
     }
 }
