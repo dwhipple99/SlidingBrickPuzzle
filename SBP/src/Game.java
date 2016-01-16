@@ -187,7 +187,22 @@ public class Game {
         return clone;
     }
 
-    public static void gameStateSolved(Game g){}
+    // See if the game is solved
+    // This is done by checking if if a -1 exists anywhere in the matrix
+    // if so that means the puzzle is not solved
+    public static boolean gameStateSolved(Game g1){
+
+        boolean solved=true;
+
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                if (g1.board[j][i]==-1) {
+                    solved=false;
+                }
+            }
+        }
+        return solved;
+    }
 
     public static void allMovesHelp(){}
 
@@ -217,18 +232,31 @@ public class Game {
         loadGameState(level0, myPath, fileName);
         outputGameState(level0);
 
-        Game level0Clone=cloneGameState(level0);
-        outputGameState(level0Clone);
+        if (gameStateSolved(level0)) {
+            System.out.println("Game level0 is solved");
+        }
+        else {
+            System.out.println("Game level0 not solved");
+        }
+        //Game level0Clone=cloneGameState(level0);
+        //outputGameState(level0Clone);
 
         //prettyPrintGameState(level0);
-/*
-        // Load SBP-Level0.txt
+
+        // Load SBP-Level0-solved.txt
         Game level0Solved = new Game("Level 0 Solved", 0,0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
         fileName="SBP-level0-solved.txt";
         loadGameState(level0Solved, myPath, fileName);
         outputGameState(level0Solved);
 
+        if (gameStateSolved(level0Solved)) {
+            System.out.println("Game level0-solved is solved");
+        }
+        else {
+            System.out.println("Game level0-solved not solved");
+        }
+/*
         // Load SBP-Level1.txt
         Game level1 = new Game("Level 1", 0, 0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
