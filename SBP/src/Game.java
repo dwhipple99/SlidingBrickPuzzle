@@ -6,30 +6,38 @@
  * It is intended to implement a Sliding Brick Puzzle
  */
 
+import java.lang.Object;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-//import java.io.IOException;
+import java.util.Scanner;
 
 public class Game {
 
-    public enum Cellstate {FREE, WALL, GOAL}
+    public enum Cellstate {FREE, WALL, GOAL, MASTER}
 
     String gameName;
     int w;   // Width of board
     int h;   // Height of board
 
+    Cellstate[][] board;
+
+    // Constructor
     public Game(String name, int width, int height) {
 
         gameName=name;
         w=width;
         h=height;
-        System.out.print("Initializing Game ");
+        /*System.out.print("Initializing Game \"");
         System.out.print(gameName);
+        System.out.print("\"");
         System.out.print(", width=");
         System.out.print(w);
         System.out.print(", height=");
         System.out.print(h);
         System.out.println(".");
+        */
         }
 
     // Retrieve the width
@@ -39,13 +47,56 @@ public class Game {
     // Retrieve the height
     public int getHeight() { return h;}
 
-    public static boolean loadGameState(String path, String fileName)
-    {
+    public static boolean loadGameState(Game g1, String path, String fileName) {
+
         System.out.print("Reading Game State from ");
         System.out.print(path);
         System.out.print(fileName);
         System.out.println(".");
 
+        int tokenNumber=1;
+        int currentRow=-1;
+        int currentCol=0;
+        String token;
+        boolean debugFunction=false;
+
+        try {
+            File text=new File(path+fileName);
+            Scanner scnr=new Scanner(text);
+
+            scnr.useDelimiter(",");
+
+            while (scnr.hasNext()) {
+                token=scnr.next();
+                token=token.replaceAll("\\s", "");
+                switch (tokenNumber) {
+                    case 1: g1.w=Integer.parseInt(token);
+                        if (debugFunction) System.out.println("Game Width="+g1.w);
+                        break;
+                    case 2: g1.h=Integer.parseInt(token);
+                        if (debugFunction) System.out.println("Game Heigth="+g1.h);
+                        break;
+                    default:
+                        if (((tokenNumber-3)%g1.w)==0) {
+                            currentRow++;
+                            currentCol=0;
+                            if (debugFunction) System.out.println("Row="+currentRow);
+                        }
+                        if (debugFunction) System.out.println("Col="+currentCol+", token="+token);
+                        currentCol++;
+                    break;
+                }
+                tokenNumber++;
+            }
+
+            scnr.close();
+
+        } catch(Exception e) {
+            System.out.println("Error opening file");
+        }
+
+
+/*
         try{
             //Create object of FileReader
             FileReader inputFile = new FileReader(path+fileName);
@@ -55,6 +106,7 @@ public class Game {
 
             //Variable to hold the one line data
             String line;
+            int lineNumber=1;
 
             // Read file line by line and print on the console
             while ((line = bufferReader.readLine()) != null)   {
@@ -65,6 +117,7 @@ public class Game {
         } catch(Exception e){
             System.out.println("Error while reading file line by line:" + e.getMessage());
         }
+*/
         return false;
     }
 
@@ -95,9 +148,9 @@ public class Game {
 
         System.out.println("Welcome to the Sliding Brick Puzzle Solver!");
 
-        Game g1 = new Game("Game 1", 3,3);
+        Game g1 = new Game("Game 1", 0,0);
 
-        loadGameState(myPath, fileName);
+        loadGameState(g1, myPath, fileName);
 
         System.out.print("Game name is ");
         System.out.println(g1.getName());
