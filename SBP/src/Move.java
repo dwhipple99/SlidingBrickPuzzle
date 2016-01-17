@@ -1,9 +1,12 @@
 /**
- * Created by dwhip_000 on 1/16/2016.
+ * Created by dwhipple_000 on 1/10/2016.
+ *
+ * The is class is designed to represent a move in the Sliding Brick Puzzle game.
+ *
  */
 public class Move {
-     // A move is a pair (piece, direction)
 
+    // Enumeration of the possible moves
     public enum Direction {
         UP("UP"), DOWN("DOWN"), LEFT("LEFT"), RIGHT("RIGHT");
 
@@ -18,6 +21,7 @@ public class Move {
         }
     }
 
+    // A move is a pair (piece, direction)
     int piece;
     Direction direction;
 

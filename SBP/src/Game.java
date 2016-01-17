@@ -599,6 +599,10 @@ public class Game {
 
     public static void randomWalk(){}
 
+    public static void breadthFirstSearch() {}
+
+    public static void depthFirstSearch() {}
+
     public static void main(String args[]) {
 
         String myPath;
