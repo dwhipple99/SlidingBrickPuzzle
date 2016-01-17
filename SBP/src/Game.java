@@ -199,6 +199,50 @@ public class Game {
     public static boolean canMoveRight {}
 */
 
+    public static int getColumn(Game g1, int piece){
+
+        int column=0;
+
+        if (piece < 2) {
+            System.out.println("Error: Invalid piece number -- EXITING");
+            System.exit(1);
+        }
+
+        //System.out.println("Board Width="+g1.getWidth());
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                if (g1.board[j][i]==piece) {
+                    column=j;
+                    i=g1.getHeight();
+                    j=g1.getWidth();
+                }
+            }
+        }
+        return column;
+    }
+
+    public static int getRow(Game g1, int piece){
+
+        int row=0;
+
+        if (piece < 2) {
+            System.out.println("Error: Invalid piece number -- EXITING");
+            System.exit(1);
+        }
+
+        //System.out.println("Board Width="+g1.getWidth());
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                if (g1.board[j][i]==piece) {
+                    row=i;
+                    i=g1.getHeight();
+                    j=g1.getWidth();
+                }
+            }
+        }
+        return row;
+    }
+
     public static int pieceWidth(Game g1, int piece){
 
         int width=1;
@@ -439,9 +483,48 @@ public class Game {
     // Required for Assignment
     //
     public static void applyMove(Game g1, Move m1) {
+        int pWidth, pHeight;
+        int column, row;
 
-        System.out.println("Move piece is"+m1.getPiece()+", Move direction is "+m1.getDirection());
+        pWidth=pieceWidth(g1,m1.getPiece());
+        pHeight=pieceHeight(g1, m1.getPiece());
 
+        column=getColumn(g1, m1.getPiece());
+        row=getRow(g1, m1.getPiece());
+
+        System.out.println("Move piece is "+m1.getPiece()+", Move direction is "+m1.getDirection());
+        System.out.println("Currently in column "+column+", row="+row);
+
+        switch (m1.getDirection()) {
+            case UP:
+                for (int i=row;i<row+pWidth;i++) {
+                    g1.board[column][row-1]=m1.getPiece();
+                    g1.board[column][i]=0;
+                }
+                break;
+            case DOWN:
+                for (int i=row;i<row+pWidth;i++) {
+                    g1.board[column][row+1]=m1.getPiece();
+                    g1.board[column][i]=0;
+                }
+                break;
+            case LEFT:
+                for (int i=column;i<column+pHeight;i++) {
+                    g1.board[column-1][row]=m1.getPiece();
+                    g1.board[i][row]=0;
+                }
+                break;
+            case RIGHT:
+                for (int i=column;i<column+pHeight;i++) {
+                    g1.board[column+1][row]=m1.getPiece();
+                    g1.board[i][row]=0;
+                }
+                break;
+            default:
+                System.out.println("<ERROR>: Invalid Move Type (EXITING)");
+                System.exit(1);
+                break;
+        }
     }
 
     // Required for Assignment
@@ -547,6 +630,8 @@ public class Game {
         while (itr.hasNext())
         {
             Move newMove=itr.next();
+            applyMove(level0, newMove);
+            outputGameState(level0);
             System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
         }
 
