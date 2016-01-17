@@ -318,7 +318,7 @@ public class Game {
             pHeight--;
         }
         if (canMoveLeft) {
-            System.out.println("canMoveLeft=true");
+            //System.out.println("canMoveLeft=true");
             Move myMove=new Move(piece, Move.Direction.LEFT);
             listOfMoves.add(myMove);
         }
@@ -337,7 +337,7 @@ public class Game {
         boolean canMoveRight = true;
         while ((pHeight >= 1) && (canMoveRight)) {
             // If above is not empty
-            System.out.println("g1.board[curRow+1][curCol+1]="+g1.board[curRow+1][curCol]);
+            //System.out.println("g1.board[curRow+1][curCol+1]="+g1.board[curRow+1][curCol]);
             if (g1.board[curRow+1][curCol] != 0) {
                 canMoveRight = false;
             }
@@ -355,7 +355,7 @@ public class Game {
     public static void allMovesHelp(Game g1, int piece, List<Move> listOfMoves){
 
         int pWidth, pHeight;
-        System.out.println("Finding moves for piece="+piece+" on game state \""+g1.getName()+"\"");
+        //System.out.println("Finding moves for piece="+piece+" on game state \""+g1.getName()+"\"");
 
         //Move myMove=new Move(2, Move.Direction.DOWN);
         //Move myMove2=new Move(7, Move.Direction.RIGHT);
@@ -365,7 +365,7 @@ public class Game {
                 if (g1.board[j][i]==piece) {
                     pWidth=pieceWidth(g1,piece);
                     pHeight=pieceHeight(g1, piece);
-                    System.out.println("Piece found @ row="+j+", col="+i+", Wid="+pWidth+", Height="+pHeight);
+                    //System.out.println("Piece found @ row="+j+", col="+i+", Wid="+pWidth+", Height="+pHeight);
 
                     boolean moveUp=canMoveUp(g1, piece, i,j,listOfMoves);
                     boolean moveDown=canMoveDown(g1, piece, i,j,listOfMoves);
@@ -384,7 +384,43 @@ public class Game {
 
     }
 
-    public static void allMoves() {}
+    public static boolean notYetSearched(Game g1,int piece, List<Move> listOfMoves) {
+
+        boolean found=false;
+
+        ListIterator<Move> itr=listOfMoves.listIterator();
+
+        while (itr.hasNext())
+        {
+            Move newMove=itr.next();
+            if (piece==newMove.getPiece()) {
+                found=true;
+                System.out.println("Already searched for piece "+piece+", Found="+found);
+            }
+            //System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
+        }
+
+        //System.out.println("Found="+found);
+        return found;
+    }
+
+    public static void allMoves(Game g1, List<Move> listOfMoves) {
+
+        int piece;
+        boolean found;
+
+        for (int i=0;i<g1.getHeight();i++) {
+            for (int j=0;j<g1.getWidth();j++) {
+                piece=g1.board[j][i];
+                found=notYetSearched(g1, piece, listOfMoves);
+                if ((g1.board[j][i]>1) && (!found)) {
+                    piece=g1.board[j][i];
+                    allMovesHelp(g1, piece, listOfMoves);
+                    System.out.println("Checked moves for piece "+piece+", Total moves in list="+listOfMoves.size());
+                }
+            }
+        }
+    }
 
     public static void applyMove() {}
 
@@ -462,9 +498,11 @@ public class Game {
         //System.out.println("Move piece="+myMove.getPiece()+", Direction="+myMove.getDirection());
 */
         List<Move> listOfMoves=new ArrayList<Move>();
-        int piece=2;
+        //int piece=2;
 
-        allMovesHelp(level0, piece, listOfMoves);
+        //allMovesHelp(level0, piece, listOfMoves);
+
+        allMoves(level0, listOfMoves);
 
         System.out.println("Number of list items="+listOfMoves.size());
 
