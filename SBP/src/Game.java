@@ -416,19 +416,19 @@ public class Game {
 
         for (int i=0;i<g1.getHeight();i++) {
             for (int j=0;j<g1.getWidth();j++) {
-                if (g1.board[j][i]==piece) {
-                    pWidth=pieceWidth(g1,piece);
-                    pHeight=pieceHeight(g1, piece);
+                if (g1.board[j][i] == piece) {
+                    pWidth = pieceWidth(g1, piece);
+                    pHeight = pieceHeight(g1, piece);
                     //System.out.println("Piece found @ row="+j+", col="+i+", Wid="+pWidth+", Height="+pHeight);
 
-                    boolean moveUp=canMoveUp(g1, piece, i,j,listOfMoves);
-                    boolean moveDown=canMoveDown(g1, piece, i,j,listOfMoves);
-                    boolean moveLeft=canMoveLeft(g1, piece, i,j,listOfMoves);
-                    boolean moveRight=canMoveRight(g1, piece, i,j,listOfMoves);
+                    boolean moveUp = canMoveUp(g1, piece, i, j, listOfMoves);
+                    boolean moveDown = canMoveDown(g1, piece, i, j, listOfMoves);
+                    boolean moveLeft = canMoveLeft(g1, piece, i, j, listOfMoves);
+                    boolean moveRight = canMoveRight(g1, piece, i, j, listOfMoves);
 
                     // Force the loops to end
-                    i=g1.getHeight();
-                    j=g1.getWidth();
+                    i = g1.getHeight();
+                    j = g1.getWidth();
                 }
             }
         }
@@ -510,15 +510,19 @@ public class Game {
                 }
                 break;
             case LEFT:
-                for (int i=column;i<column+pWidth;i++) {
-                    g1.board[i-1][row]=piece;
-                    g1.board[i][row]=0;
+                for (int k=row;k<row+pHeight;k++) {
+                    for (int i=column;i<column+pWidth;i++) {
+                        g1.board[i-1][k]=piece;
+                        g1.board[i][k]=0;
+                    }
                 }
                 break;
             case RIGHT:
-                for (int i=column;i<column+pWidth;i++) {
-                    g1.board[i+1][row]=piece;
-                    g1.board[i][row]=0;
+                for (int k=row;k<row+pHeight;k++) {
+                    for (int i=column;i<column+pWidth;i++) {
+                        g1.board[i+1][k]=piece;
+                        g1.board[i][k]=0;
+                    }
                 }
                 break;
             default:
@@ -561,7 +565,37 @@ public class Game {
 
     }
 
-    public static void normalizeState(){}
+    public static void normalizeState(Game g1){
+        int nextIdx=3;
+        for (int i=0;i<g1.getHeight();i++){
+            for (int j=0;j<g1.getWidth();j++) {
+                if (g1.board[j][i]==nextIdx) {
+                    nextIdx++;
+                }
+                else {
+                    if (g1.board[j][i] > nextIdx) {
+                        swapIdx(g1, nextIdx,g1.board[j][i]);
+                        nextIdx++;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void swapIdx(Game g1, int idx1,int idx2){
+        for (int i=0;i<g1.getHeight();i++){
+            for (int j=0;j<g1.getWidth();j++){
+                if (g1.board[j][i]==idx1) {
+                    g1.board[j][i]=idx2;
+                }
+                else {
+                    if (g1.board[j][i]==idx2) {
+                        g1.board[j][i]=idx1;
+                    }
+                }
+            }
+        }
+    }
 
     public static void randomWalk(){}
 
@@ -575,7 +609,7 @@ public class Game {
         // Load SBP-Level0.txt
         Game level0 = new Game("Level 0", 0,0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level0.txt";
+        fileName="SBP-level2.txt";
         loadGameState(level0, myPath, fileName);
         outputGameState(level0);
 
@@ -618,9 +652,9 @@ public class Game {
         //System.out.println("Move piece="+myMove.getPiece()+", Direction="+myMove.getDirection());
 */
         List<Move> listOfMoves=new ArrayList<Move>();
-        //int piece=2;
+        int piece=3;
 
-        //allMovesHelp(level0, piece, listOfMoves);
+        allMovesHelp(level0, piece, listOfMoves);
 
         allMoves(level0, listOfMoves);
 
@@ -631,8 +665,8 @@ public class Game {
         while (itr.hasNext())
         {
             Move newMove=itr.next();
-            applyMove(level0, newMove);
-            outputGameState(level0);
+            //applyMove(level0, newMove);
+            //outputGameState(level0);
             System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
         }
 
@@ -664,15 +698,18 @@ public class Game {
         fileName="SBP-level3.txt";
         loadGameState(level3, myPath, fileName);
         outputGameState(level3);
-
+*/
         // Load SBP-test-not-normalized.txt
         Game notNormalized = new Game("Test Not Normalized", 0, 0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
         fileName="SBP-test-not-normalized.txt";
         loadGameState(notNormalized, myPath, fileName);
         outputGameState(notNormalized);
-        prettyPrintGameState(notNormalized);
-*/
+
+        normalizeState(notNormalized);
+        outputGameState(notNormalized);
+
+        //prettyPrintGameState(notNormalized);
 
  /*System.out.print("Game name is ");
         System.out.println(g1.getName());
