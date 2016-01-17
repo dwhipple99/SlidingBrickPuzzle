@@ -50,6 +50,8 @@ public class Game {
     // Retrieve the height
     public int getHeight() { return h;}
 
+    // Required for Assignment
+    //
     public static boolean loadGameState(Game g1, String path, String fileName) {
 
         System.out.print("Reading Game State from ");
@@ -103,6 +105,8 @@ public class Game {
         return false;
     }
 
+    // Required for Assignment
+    //
     public static void outputGameState(Game g1) {
         System.out.println("Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")");
         System.out.println(g1.w+","+g1.h+",");
@@ -114,6 +118,8 @@ public class Game {
         }
     }
 
+    // Required for Assignment
+    //
     public static void prettyPrintGameState(Game g1) {
         System.out.println("Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")");
         //System.out.println(g1.w+","+g1.h+",");
@@ -142,6 +148,8 @@ public class Game {
         }
     }
 
+    // Required for Assignment
+    //
     // This function clones the game state
     public static Game cloneGameState(Game g1){
 
@@ -352,6 +360,8 @@ public class Game {
         return canMoveRight;
     }
 
+    // Required for Assignment
+    //
     public static void allMovesHelp(Game g1, int piece, List<Move> listOfMoves){
 
         int pWidth, pHeight;
@@ -384,6 +394,8 @@ public class Game {
 
     }
 
+    // Helper function for allMoves
+    //
     public static boolean notYetSearched(Game g1,int piece, List<Move> listOfMoves) {
 
         boolean found=false;
@@ -404,6 +416,8 @@ public class Game {
         return found;
     }
 
+    // Required for Assignment
+    //
     public static void allMoves(Game g1, List<Move> listOfMoves) {
 
         int piece;
@@ -422,10 +436,32 @@ public class Game {
         }
     }
 
-    public static void applyMove() {}
+    // Required for Assignment
+    //
+    public static void applyMove(Game g1, Move m1) {
 
-    public static void applyMoveCloning(){}
+        System.out.println("Move piece is"+m1.getPiece()+", Move direction is "+m1.getDirection());
 
+    }
+
+    // Required for Assignment
+    //
+    public static Game applyMoveCloning(Game g1, Move m1){
+
+        String newName;
+        newName=g1.getName()+" clone";
+
+        Game clone = new Game(newName, 0,0);
+
+        clone=cloneGameState(g1);
+
+        applyMove(clone, m1);
+
+        return clone;
+    }
+
+    // Required for Assignment
+    //
     public static boolean stateEqual(Game g1, Game g2){
 
         boolean equal=true;
