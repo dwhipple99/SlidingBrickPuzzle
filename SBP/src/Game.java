@@ -58,9 +58,9 @@ public class Game {
 
     // Required for Assignment
     //
-    public static boolean loadGameState(Game g1, String path, String fileName) {
+    public static boolean loadGameState(Game g1, String fileName) {
 
-        String logInfo="Reading game state from "+path+fileName+".";
+        String logInfo="Reading game state from "+fileName+".";
 
         log("INFO",logInfo);
 
@@ -71,7 +71,7 @@ public class Game {
         boolean debugFunction=false;
 
         try {
-            File text=new File(path+fileName);
+            File text=new File(fileName);
             Scanner scnr=new Scanner(text);
 
             scnr.useDelimiter(",");
@@ -527,7 +527,7 @@ public class Game {
         row=getRow(g1, m1.getPiece());
 
         logInfo="Move piece is "+m1.getPiece()+", Move direction is "+m1.getDirection();
-        //log("INFO", logInfo);
+        log("INFO", logInfo);
         logInfo="Currently in column "+column+", row="+row;
         //log("INFO", logInfo);
 
@@ -662,9 +662,11 @@ public class Game {
         int min=0;
         int max=0;
         int pickedRandomNumber;
+        int moveNumber=0;
         Move nextMove;
 
         while (n>0) {
+            moveNumber++;
 
             allMoves(g1, listOfMoves);
             max=listOfMoves.size();
@@ -695,12 +697,12 @@ public class Game {
             outputGameState(g1);
 
             if (gameStateSolved(g1)) {
-                logInfo="Game Solved";
+                logInfo="Game Solved in "+moveNumber+" moves.";
                 log("SUCCESS", logInfo);
                 System.exit(0);
             }
             else {
-                logInfo="Game not yet solved.";
+                logInfo="Game not yet solved after "+moveNumber+" moves.";
                 log("INFO", logInfo);
             }
 
@@ -730,7 +732,72 @@ public class Game {
         log("INFO", logInfo);
 
     }
-    public static void breadthFirstSearch() {}
+    public static boolean breadthFirstSearch(Game g1) {
+
+        String logInfo="Solving game with BFS";
+        log("INFO", logInfo);
+        List<Move> listOfMoves=new ArrayList<Move>();
+        int moveNumber=0;
+        Game nodeState = cloneGameState(g1);
+        Queue<Game> frontier=new LinkedList<Game>();
+        Queue<Game> explored=new LinkedList<Game>();
+
+        ListIterator<Move> itr=listOfMoves.listIterator();
+
+//        allMoves(nodeState, listOfMoves);
+//        dumpMoves(listOfMoves);
+        boolean notDone=true;
+
+        if (gameStateSolved(nodeState)) {
+            return true;
+        }
+
+        frontier.add(nodeState);
+
+        int x=3;
+
+        do {
+            x--;
+            if (frontier.isEmpty()) {
+                return false;
+            }
+            Game newGame=frontier.remove();
+            explored.add(nodeState);
+
+            Game cloneGame = cloneGameState(g1);
+
+            listOfMoves.clear();
+
+            allMoves(newGame, listOfMoves);
+            dumpMoves(listOfMoves);
+
+            for (Move newMove: listOfMoves ) {
+                cloneGame = cloneGameState(newGame);
+                moveNumber++;
+                logInfo = "Move number " + moveNumber + ", Piece " + newMove.getPiece() + ", Direction=" + newMove.getDirection();
+                log("INFO", logInfo);
+
+                applyMove(cloneGame, newMove);
+                outputGameState(cloneGame);
+                if (gameStateSolved(cloneGame)) {
+                    return true;
+                }
+                frontier.add(cloneGame);
+            }
+           /* if (x==0) {
+                notDone=false;
+            }*/
+        } while (notDone);
+/*
+            if (gameStateSolved(nodeState)) {
+               return true;
+            }
+            else {
+               return false;
+            }
+*/
+        return false;
+}
 
     public static void depthFirstSearch() {}
 
@@ -741,19 +808,64 @@ public class Game {
     }
     public static void main(String args[]) {
 
-        String myPath;
-        String fileName;
         System.out.println("Welcome to the Sliding Brick Puzzle Solver!");
 
+        String firstArg;
+        String logInfo;
+        logInfo="Number of CMD line arguments="+args.length;
+        int iterations=0;
+
+        //log("INFO", logInfo);
+        // Assume random search
+        if ((args.length != 4) && (args.length != 3)) {
+            System.out.println("Usage: java Game [game-name] [filename] [mode] [iterations]\n");
+            System.out.println("             [game-name] is an arbitrary string to represent the name");
+            System.out.println("             [filename] is the name of the input file\n");
+            System.out.println(" mode can be 1: run random-search for [iterations]");
+            System.out.println("             2: run breadth-first-search");
+            System.out.println("             3: run depth-first-search\n");
+            System.out.println("             [iterations] is the number N in random-search, can be left off for other searchs");
+            System.out.println(" EXAMPLE:" );
+            System.out.println("             \"java Game level0 SBP-level0.txt 1 100 (runs random-search for 100 iterations)\"");
+            System.out.println("             \"java Game level0 SBP-level0.txt 2 (runs breadth-first-search)\"");
+            System.out.println("             \"java Game level0 SBP-level0.txt 3 (runs depth-first-search)\"");
+            System.exit(2);
+        }
+        if (args.length==4) {
+            iterations=Integer.parseInt(args[3]);
+        }
+        String gameName=args[0];
+        String fileName=args[1];
+        int mode=Integer.parseInt(args[2]);
+
+        logInfo="game-name="+gameName+", fileName="+fileName+", mode="+mode+", iterations="+iterations;
+        log("INFO", logInfo);
 
         // Load SBP-Level0.txt
-        Game level0 = new Game("Level 0", 0,0);
-        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level0.txt";
-        loadGameState(level0, myPath, fileName);
-        outputGameState(level0);
+        Game game = new Game(gameName, 0,0);
+        //myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
+        //fileName="SBP-level2.txt";
+        loadGameState(game, fileName);
+        outputGameState(game);
 
-        randomWalk(level0, 200);
+        switch (mode) {
+            case 1: randomWalk(game, iterations);
+                break;
+            case 2:  boolean solution = breadthFirstSearch(game);
+                     if (solution) {
+                         logInfo = "Game Solved with BFS";
+                         log("SUCCESS", logInfo);
+                     }
+                     else {
+                         logInfo = "Game NOT solved with BFS";
+                         log("FAILURE", logInfo);
+                     }
+                    break;
+            default:  log("ERROR", "Invalid game mode.");
+                break;
+        }
+
+        System.exit(0);
 
         //int piece=3;
         //System.out.println("Piece Width of piece="+piece+" is "+pieceWidth(level0,piece));
