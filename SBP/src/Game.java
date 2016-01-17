@@ -485,6 +485,7 @@ public class Game {
     public static void applyMove(Game g1, Move m1) {
         int pWidth, pHeight;
         int column, row;
+        int piece=m1.getPiece();
 
         pWidth=pieceWidth(g1,m1.getPiece());
         pHeight=pieceHeight(g1, m1.getPiece());
@@ -497,26 +498,26 @@ public class Game {
 
         switch (m1.getDirection()) {
             case UP:
-                for (int i=row;i<row+pWidth;i++) {
-                    g1.board[column][row-1]=m1.getPiece();
+                for (int i=row;i<row+pHeight;i++) {
+                    g1.board[column][i-1]=piece;
                     g1.board[column][i]=0;
                 }
                 break;
             case DOWN:
-                for (int i=row;i<row+pWidth;i++) {
-                    g1.board[column][row+1]=m1.getPiece();
+                for (int i=row;i<row+pHeight;i++) {
+                    g1.board[column][i+1]=piece;
                     g1.board[column][i]=0;
                 }
                 break;
             case LEFT:
-                for (int i=column;i<column+pHeight;i++) {
-                    g1.board[column-1][row]=m1.getPiece();
+                for (int i=column;i<column+pWidth;i++) {
+                    g1.board[i-1][row]=piece;
                     g1.board[i][row]=0;
                 }
                 break;
             case RIGHT:
-                for (int i=column;i<column+pHeight;i++) {
-                    g1.board[column+1][row]=m1.getPiece();
+                for (int i=column;i<column+pWidth;i++) {
+                    g1.board[i+1][row]=piece;
                     g1.board[i][row]=0;
                 }
                 break;
