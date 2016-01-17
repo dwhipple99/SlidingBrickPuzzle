@@ -1,30 +1,36 @@
 /**
- * Created by dwhipple on 1/16/2016.
+ * Created by dwhipple on 1/10/2016.
  *
  * This code is written for a course @ Drexel University, Introduction to AI, cs510
  *
  * It is intended to implement a Sliding Brick Puzzle
  */
 
-import java.lang.System.*;
+
 import java.util.*;
-import java.lang.Object;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Scanner;
+import java.io.File;
+import java.util.Random;
+//import java.lang.Object;
+//import java.io.BufferedReader;
+//import java.lang.System.*;
+// import java.io.FileNotFoundException;
+//import java.io.FileReader;
 
-
+// This is the primary Class to represent the state of a game
+//
 public class Game {
 
-    public enum Cellstate {FREE, WALL, GOAL, MASTER}
-
+    // A text name for a game.
     String gameName;
+    // a board is w by h
     int w;   // Width of board
     int h;   // Height of board
 
+    // The board
     int[][] board;
+
+    String logSeverity="INFO";
 
     // Constructor
     public Game(String name, int width, int height) {
@@ -54,10 +60,9 @@ public class Game {
     //
     public static boolean loadGameState(Game g1, String path, String fileName) {
 
-        System.out.print("Reading Game State from ");
-        System.out.print(path);
-        System.out.print(fileName);
-        System.out.println(".");
+        String logInfo="Reading game state from "+path+fileName+".";
+
+        log("INFO",logInfo);
 
         int tokenNumber=1;
         int currentRow=-1;
@@ -76,10 +81,12 @@ public class Game {
                 token=token.replaceAll("\\s", "");
                 switch (tokenNumber) {
                     case 1: g1.w=Integer.parseInt(token);
-                        System.out.println("Game Width="+g1.w);
+                        logInfo="Game Width="+g1.w;
+                        //log("INFO", logInfo);
                         break;
                     case 2: g1.h=Integer.parseInt(token);
-                        System.out.println("Game Heigth="+g1.h);
+                        logInfo="Game Heigth="+g1.h;
+                        //log("INFO", logInfo);
                         g1.board = new int[g1.w][g1.h];
                         break;
                     default:
@@ -100,7 +107,7 @@ public class Game {
             scnr.close();
 
         } catch(Exception e) {
-            System.out.println("Error opening file");
+            log("ERROR", "Error opening file, exiting");
         }
         return false;
     }
@@ -108,7 +115,10 @@ public class Game {
     // Required for Assignment
     //
     public static void outputGameState(Game g1) {
-        System.out.println("Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")");
+
+        String logInfo;
+        logInfo="Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")";
+        log("INFO", logInfo);
         System.out.println(g1.w+","+g1.h+",");
         for (int i=0;i<g1.getHeight();i++) {
             for (int j=0;j<g1.getWidth();j++) {
@@ -118,7 +128,7 @@ public class Game {
         }
     }
 
-    // Required for Assignment
+    //  This function was not required for the assignment, just added for fun.
     //
     public static void prettyPrintGameState(Game g1) {
         System.out.println("Dumping game \""+g1.getName()+"\" (Height="+g1.getHeight()+", Width="+g1.getWidth()+")");
@@ -150,7 +160,8 @@ public class Game {
 
     // Required for Assignment
     //
-    // This function clones the game state
+    // This function clones the game state and returns a completely new game state
+    //
     public static Game cloneGameState(Game g1){
 
         System.out.println("Cloning \""+g1.getName()+"\"");
@@ -191,14 +202,9 @@ public class Game {
         return solved;
     }
 
-    /*public static boolean canMoveUp(Game g1, int piece) {
-        if
-    }
-    public static boolean canMoveDown {}
-    public static boolean canMoveLeft {}
-    public static boolean canMoveRight {}
-*/
-
+    // Returns the Column number of a piece
+    //
+    // Built as a helper function
     public static int getColumn(Game g1, int piece){
 
         int column=0;
@@ -221,6 +227,9 @@ public class Game {
         return column;
     }
 
+    // Returns the Row number of a piece
+    //
+    // Built as a helper function
     public static int getRow(Game g1, int piece){
 
         int row=0;
@@ -243,6 +252,9 @@ public class Game {
         return row;
     }
 
+    // Returns the Width of a piece on the board
+    //
+    // Built as a helper function
     public static int pieceWidth(Game g1, int piece){
 
         int width=1;
@@ -270,6 +282,9 @@ public class Game {
         return width;
     }
 
+    // Returns the Hieght of a piece on the board
+    //
+    // Built as a helper function
     public static int pieceHeight(Game g1, int piece){
 
         int height=1;
@@ -296,6 +311,9 @@ public class Game {
         return height;
     }
 
+    //  Returns True if the piece can move UP
+    //
+    // Built as a helper function
     public static boolean canMoveUp(Game g1, int piece, int i, int j, List<Move> listOfMoves){
         int pWidth, pHeight;
         int curCol, curRow;
@@ -309,7 +327,7 @@ public class Game {
         // Check if can move up, entire width must be able to move up
         boolean canMoveUp=true;
         while ((pWidth >= 1) && (canMoveUp)) {
-            if (g1.board[curRow][curCol-1]!=0){
+            if ((g1.board[curRow][curCol-1]!=0) && ((g1.board[curRow][curCol-1]!=-1) || piece!=2)) {
                 canMoveUp=false;
             }
             curRow++;
@@ -322,6 +340,9 @@ public class Game {
         return canMoveUp;
     }
 
+    //  Returns True if the piece can move DOWN
+    //
+    // Built as a helper function
     public static boolean canMoveDown(Game g1, int piece, int i, int j, List<Move> listOfMoves){
         int pWidth, pHeight;
         int curCol, curRow;
@@ -335,7 +356,7 @@ public class Game {
         // Check if can move up, entire width must be able to move up
         boolean canMoveDown=true;
         while ((pWidth >= 1) && (canMoveDown)) {
-            if (g1.board[curRow][curCol+1]!=0){
+            if ((g1.board[curRow][curCol+1]!=0) && ((g1.board[curRow][curCol+1]!=-1) || piece!=2)) {
                 canMoveDown=false;
             }
             curRow++;
@@ -348,6 +369,9 @@ public class Game {
         return canMoveDown;
     }
 
+    //  Returns True if the piece can move LEFT
+    //
+    // Built as a helper function
     public static boolean canMoveLeft(Game g1, int piece, int i, int j, List<Move> listOfMoves){
         int pWidth, pHeight;
         int curCol, curRow;
@@ -363,7 +387,7 @@ public class Game {
         while ((pHeight >= 1) && (canMoveLeft)) {
             // If above is not empty
             //System.out.println("g1.board[curRow-1][curCol]="+g1.board[curRow-1][curCol]);
-            if (g1.board[curRow-1][curCol]!=0){
+            if ((g1.board[curRow-1][curCol]!=0) && ((g1.board[curRow-1][curCol]!=-1) || piece!=2)){
                 canMoveLeft=false;
             }
             curCol++;
@@ -377,6 +401,9 @@ public class Game {
         return canMoveLeft;
     }
 
+    //  Returns True if the piece can move RIGHT
+    //
+    // Built as a helper function
     public static boolean canMoveRight(Game g1, int piece, int i, int j, List<Move> listOfMoves) {
         int pWidth, pHeight;
         int curCol, curRow;
@@ -390,14 +417,14 @@ public class Game {
         while ((pHeight >= 1) && (canMoveRight)) {
             // If above is not empty
             //System.out.println("g1.board[curRow+1][curCol+1]="+g1.board[curRow+1][curCol]);
-            if (g1.board[curRow+1][curCol] != 0) {
+            if ((g1.board[curRow+1][curCol] != 0) && ((g1.board[curRow+1][curCol] != 0) || piece!=2)) {
                 canMoveRight = false;
             }
             curCol++;
             pHeight--;
         }
         if (canMoveRight) {
-            System.out.println("canMoveRight=true");
+            //System.out.println("canMoveRight=true");
             Move myMove = new Move(piece, Move.Direction.RIGHT);
             listOfMoves.add(myMove);
         }
@@ -406,13 +433,10 @@ public class Game {
 
     // Required for Assignment
     //
+    // Returns a list of moves that a single piece can make
     public static void allMovesHelp(Game g1, int piece, List<Move> listOfMoves){
 
         int pWidth, pHeight;
-        //System.out.println("Finding moves for piece="+piece+" on game state \""+g1.getName()+"\"");
-
-        //Move myMove=new Move(2, Move.Direction.DOWN);
-        //Move myMove2=new Move(7, Move.Direction.RIGHT);
 
         for (int i=0;i<g1.getHeight();i++) {
             for (int j=0;j<g1.getWidth();j++) {
@@ -440,9 +464,12 @@ public class Game {
 
     // Helper function for allMoves
     //
+    // Returns TRUE if the piece number already has been searched for possible moves
+    //
     public static boolean notYetSearched(Game g1,int piece, List<Move> listOfMoves) {
 
         boolean found=false;
+        String logInfo;
 
         ListIterator<Move> itr=listOfMoves.listIterator();
 
@@ -451,7 +478,8 @@ public class Game {
             Move newMove=itr.next();
             if (piece==newMove.getPiece()) {
                 found=true;
-                System.out.println("Already searched for piece "+piece+", Found="+found);
+                logInfo="Already searched for piece "+piece+", Found="+found;
+                //log("INFO", logInfo);
             }
             //System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
         }
@@ -462,10 +490,12 @@ public class Game {
 
     // Required for Assignment
     //
+    // Returns all possible moves on a board
     public static void allMoves(Game g1, List<Move> listOfMoves) {
 
         int piece;
         boolean found;
+        String logInfo;
 
         for (int i=0;i<g1.getHeight();i++) {
             for (int j=0;j<g1.getWidth();j++) {
@@ -474,7 +504,8 @@ public class Game {
                 if ((g1.board[j][i]>1) && (!found)) {
                     piece=g1.board[j][i];
                     allMovesHelp(g1, piece, listOfMoves);
-                    System.out.println("Checked moves for piece "+piece+", Total moves in list="+listOfMoves.size());
+                    //logInfo="Checked moves for piece "+piece+", Total moves in list="+listOfMoves.size();
+                    //log("INFO",logInfo);
                 }
             }
         }
@@ -482,10 +513,12 @@ public class Game {
 
     // Required for Assignment
     //
+    // Actually applies a move to a board
     public static void applyMove(Game g1, Move m1) {
         int pWidth, pHeight;
         int column, row;
         int piece=m1.getPiece();
+        String logInfo;
 
         pWidth=pieceWidth(g1,m1.getPiece());
         pHeight=pieceHeight(g1, m1.getPiece());
@@ -493,20 +526,26 @@ public class Game {
         column=getColumn(g1, m1.getPiece());
         row=getRow(g1, m1.getPiece());
 
-        System.out.println("Move piece is "+m1.getPiece()+", Move direction is "+m1.getDirection());
-        System.out.println("Currently in column "+column+", row="+row);
+        logInfo="Move piece is "+m1.getPiece()+", Move direction is "+m1.getDirection();
+        //log("INFO", logInfo);
+        logInfo="Currently in column "+column+", row="+row;
+        //log("INFO", logInfo);
 
         switch (m1.getDirection()) {
             case UP:
-                for (int i=row;i<row+pHeight;i++) {
-                    g1.board[column][i-1]=piece;
-                    g1.board[column][i]=0;
+                for (int k=column;k<column+pWidth;k++) {
+                    for (int i = row; i < row + pHeight; i++) {
+                        g1.board[k][i - 1] = piece;
+                        g1.board[k][i] = 0;
+                    }
                 }
                 break;
             case DOWN:
-                for (int i=row;i<row+pHeight;i++) {
-                    g1.board[column][i+1]=piece;
-                    g1.board[column][i]=0;
+                for (int k=column;k<column+pWidth;k++) {
+                    for (int i = row; i < row + pHeight; i++) {
+                        g1.board[k][i + 1] = piece;
+                        g1.board[k][i] = 0;
+                    }
                 }
                 break;
             case LEFT:
@@ -534,6 +573,7 @@ public class Game {
 
     // Required for Assignment
     //
+    // Creates a clone and then applies a move to the clone, returns the clone
     public static Game applyMoveCloning(Game g1, Move m1){
 
         String newName;
@@ -550,6 +590,7 @@ public class Game {
 
     // Required for Assignment
     //
+    // Looks at two boards and declares if they are Exactly equal
     public static boolean stateEqual(Game g1, Game g2){
 
         boolean equal=true;
@@ -565,6 +606,9 @@ public class Game {
 
     }
 
+    // Required for Assignment
+    //
+    // Normalizes the board
     public static void normalizeState(Game g1){
         int nextIdx=3;
         for (int i=0;i<g1.getHeight();i++){
@@ -582,6 +626,7 @@ public class Game {
         }
     }
 
+    // Helper function for Normalized
     public static void swapIdx(Game g1, int idx1,int idx2){
         for (int i=0;i<g1.getHeight();i++){
             for (int j=0;j<g1.getWidth();j++){
@@ -597,12 +642,103 @@ public class Game {
         }
     }
 
-    public static void randomWalk(){}
+    // Given a state and a integer n, this function:
+    // 1. Generates all moves that can be generated
+    // 2. Selects one at Random
+    // 3. Executes that move
+    // 4. Noramlizes the resulting game state
+    // 5. If we have reached the goal, or we have executed n
+    //    moves, stop, otherwise loop
+    //
+    public static void randomWalk(Game g1, int n){
 
+        String logInfo;
+        logInfo="Running Random Walk on \""+g1.getName()+"\" with n="+n+"(max)";
+        log("INFO", logInfo);
+
+        // Define a list for all moves
+        List<Move> listOfMoves=new ArrayList<Move>();
+
+        int min=0;
+        int max=0;
+        int pickedRandomNumber;
+        Move nextMove;
+
+        while (n>0) {
+
+            allMoves(g1, listOfMoves);
+            max=listOfMoves.size();
+
+            Random rand = new Random();
+            pickedRandomNumber=rand.nextInt(max);
+
+            dumpMoves(listOfMoves);
+            //System.out.println("Selecting a random number between "+min+" and "+(max-1)+", it is "+pickedRandomNumber);
+            logInfo="Selecting a random number between "+min+" and "+(max-1)+", it is "+pickedRandomNumber;
+            log("INFO", logInfo);
+
+            nextMove=listOfMoves.get(pickedRandomNumber);
+
+            logInfo="Next move is ("+nextMove.getPiece()+","+nextMove.getDirection()+")";
+            log("INFO", logInfo);
+
+            applyMove(g1, nextMove);
+
+            //logInfo="This is the board after the move applied:";
+            //log("INFO", logInfo);
+
+            //outputGameState(g1);
+
+            normalizeState(g1);
+            logInfo="This is the board after normalized:";
+            log("INFO", logInfo);
+            outputGameState(g1);
+
+            if (gameStateSolved(g1)) {
+                logInfo="Game Solved";
+                log("SUCCESS", logInfo);
+                System.exit(0);
+            }
+            else {
+                logInfo="Game not yet solved.";
+                log("INFO", logInfo);
+            }
+
+            listOfMoves.clear();
+
+            n--;
+        }
+        outputGameState(g1);
+    }
+
+    public static void dumpMoves(List<Move> listOfMoves){
+
+        String logInfo;
+
+        logInfo="Total="+listOfMoves.size()+" {";
+
+        ListIterator<Move> itr=listOfMoves.listIterator();
+
+        while (itr.hasNext())
+        {
+            Move newMove=itr.next();
+            logInfo=logInfo+"("+newMove.getPiece()+","+newMove.getDirection()+")";
+            //System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
+        }
+        logInfo=logInfo+"}";
+
+        log("INFO", logInfo);
+
+    }
     public static void breadthFirstSearch() {}
 
     public static void depthFirstSearch() {}
 
+    public static void log(String severity, String toPrint) {
+
+        System.out.println("["+severity+"] "+toPrint);
+
+    }
     public static void main(String args[]) {
 
         String myPath;
@@ -613,9 +749,11 @@ public class Game {
         // Load SBP-Level0.txt
         Game level0 = new Game("Level 0", 0,0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level2.txt";
+        fileName="SBP-level0.txt";
         loadGameState(level0, myPath, fileName);
         outputGameState(level0);
+
+        randomWalk(level0, 200);
 
         //int piece=3;
         //System.out.println("Piece Width of piece="+piece+" is "+pieceWidth(level0,piece));
@@ -655,8 +793,9 @@ public class Game {
 
         //System.out.println("Move piece="+myMove.getPiece()+", Direction="+myMove.getDirection());
 */
+/*
         List<Move> listOfMoves=new ArrayList<Move>();
-        int piece=3;
+        int piece=4;
 
         allMovesHelp(level0, piece, listOfMoves);
 
@@ -669,12 +808,12 @@ public class Game {
         while (itr.hasNext())
         {
             Move newMove=itr.next();
-            //applyMove(level0, newMove);
-            //outputGameState(level0);
+            applyMove(level0, newMove);
+            outputGameState(level0);
             System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
         }
-
-/*
+*/
+        /*
         // Load SBP-Level1.txt
         Game level1 = new Game("Level 1", 0, 0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
@@ -703,7 +842,7 @@ public class Game {
         loadGameState(level3, myPath, fileName);
         outputGameState(level3);
 */
-        // Load SBP-test-not-normalized.txt
+/*        // Load SBP-test-not-normalized.txt
         Game notNormalized = new Game("Test Not Normalized", 0, 0);
         myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
         fileName="SBP-test-not-normalized.txt";
@@ -714,7 +853,7 @@ public class Game {
         outputGameState(notNormalized);
 
         //prettyPrintGameState(notNormalized);
-
+*/
  /*System.out.print("Game name is ");
         System.out.println(g1.getName());
         System.out.print("Game width is ");
