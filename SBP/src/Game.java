@@ -807,7 +807,6 @@ public class Game {
         frontier.addFirst(nodeState);
 
         do {
-            x--;
             if (frontier.isEmpty()) {
                 return false;
             }
