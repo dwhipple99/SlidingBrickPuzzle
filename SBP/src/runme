@@ -1,0 +1,18 @@
+#
+# This runs it in random-search mode
+java Game game1 SBP-level0.txt 1 500
+java Game game2 SBP-level1.txt 1 500
+java Game game3 SBP-level2.txt 1 500
+#
+# This runs it in BFS mode
+java Game game1 SBP-level0.txt 2
+java Game game2 SBP-level1.txt 2
+java Game game3 SBP-level2.txt 2
+#
+# This runs it in DFS mode
+java Game game1 SBP-level0.txt 3
+java Game game2 SBP-level1.txt 3
+java Game game3 SBP-level2.txt 3
+#
+# This runs it in normalized mode
+java Game game SBP-test-not-normaized.txt 4

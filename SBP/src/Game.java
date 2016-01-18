@@ -76,11 +76,11 @@ public class Game {
                 token=token.replaceAll("\\s", "");
                 switch (tokenNumber) {
                     case 1: g1.w=Integer.parseInt(token);
-                        logInfo="Game Width="+g1.w;
+                        //logInfo="Game Width="+g1.w;
                         //log("INFO", logInfo);
                         break;
                     case 2: g1.h=Integer.parseInt(token);
-                        logInfo="Game Heigth="+g1.h;
+                        //logInfo="Game Heigth="+g1.h;
                         //log("INFO", logInfo);
                         g1.board = new int[g1.w][g1.h];
                         break;
@@ -899,6 +899,7 @@ public class Game {
             System.out.println(" mode can be 1: run random-search for [iterations]");
             System.out.println("             2: run breadth-first-search");
             System.out.println("             3: run depth-first-search\n");
+            System.out.println("             4: run normalization\n");
             System.out.println("             [iterations] is the number N in random-search, can be left off for other searchs");
             System.out.println(" EXAMPLE:" );
             System.out.println("             \"java Game level0 SBP-level0.txt 1 100 (runs random-search for 100 iterations)\"");
@@ -943,6 +944,10 @@ public class Game {
                     logInfo = "Game NOT solved with DFS";
                     log("FAILURE", logInfo);
                 }
+                break;
+            case 4:  normalizeState(game);
+                     log("INFO","Normalized game state:");
+                     outputGameState(game);
                 break;
             default:  log("ERROR", "Invalid game mode.");
                 break;
