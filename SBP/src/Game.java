@@ -11,11 +11,6 @@ import java.util.*;
 import java.util.Scanner;
 import java.io.File;
 import java.util.Random;
-//import java.lang.Object;
-//import java.io.BufferedReader;
-//import java.lang.System.*;
-// import java.io.FileNotFoundException;
-//import java.io.FileReader;
 
 // This is the primary Class to represent the state of a game
 //
@@ -152,8 +147,7 @@ public class Game {
                         System.out.format("%2d", g1.board[j][i]);
                         break;
                 }
-                    //System.out.print(g1.board[j][i]+",");
-                }
+            }
             System.out.println();
         }
     }
@@ -167,7 +161,7 @@ public class Game {
         System.out.println("Cloning \""+g1.getName()+"\"");
 
         String newName;
-        newName=g1.getName()+" clone";
+        newName=g1.getName();
 
         Game clone = new Game(newName, 0,0);
 
@@ -282,7 +276,7 @@ public class Game {
         return width;
     }
 
-    // Returns the Hieght of a piece on the board
+    // Returns the Height of a piece on the board
     //
     // Built as a helper function
     public static int pieceHeight(Game g1, int piece){
@@ -443,7 +437,6 @@ public class Game {
                 if (g1.board[j][i] == piece) {
                     pWidth = pieceWidth(g1, piece);
                     pHeight = pieceHeight(g1, piece);
-                    //System.out.println("Piece found @ row="+j+", col="+i+", Wid="+pWidth+", Height="+pHeight);
 
                     boolean moveUp = canMoveUp(g1, piece, i, j, listOfMoves);
                     boolean moveDown = canMoveDown(g1, piece, i, j, listOfMoves);
@@ -456,10 +449,6 @@ public class Game {
                 }
             }
         }
-
-       // listOfMoves.add(myMove);
-       // listOfMoves.add(myMove2);
-
     }
 
     // Helper function for allMoves
@@ -577,7 +566,7 @@ public class Game {
     public static Game applyMoveCloning(Game g1, Move m1){
 
         String newName;
-        newName=g1.getName()+" clone";
+        newName=g1.getName();
 
         Game clone = new Game(newName, 0,0);
 
@@ -713,6 +702,8 @@ public class Game {
         outputGameState(g1);
     }
 
+    // Used for troubleshooting to print out the list of moves
+    //
     public static void dumpMoves(List<Move> listOfMoves){
 
         String logInfo;
@@ -732,6 +723,10 @@ public class Game {
         log("INFO", logInfo);
 
     }
+
+    // Required for the homework, This is the BFS
+    // Algorithm from the book.
+    //
     public static boolean breadthFirstSearch(Game g1) {
 
         String logInfo="Solving game with BFS";
@@ -744,27 +739,23 @@ public class Game {
 
         ListIterator<Move> itr=listOfMoves.listIterator();
 
-//        allMoves(nodeState, listOfMoves);
-//        dumpMoves(listOfMoves);
         boolean notDone=true;
 
         if (gameStateSolved(nodeState)) {
             return true;
         }
 
+        normalizeState(nodeState);
         frontier.add(nodeState);
 
-        int x=3;
-
         do {
-            x--;
             if (frontier.isEmpty()) {
                 return false;
             }
             Game newGame=frontier.remove();
-            explored.add(nodeState);
+            explored.add(newGame);
 
-            Game cloneGame = cloneGameState(g1);
+            Game cloneGame = cloneGameState(newGame);
 
             listOfMoves.clear();
 
@@ -782,30 +773,117 @@ public class Game {
                 if (gameStateSolved(cloneGame)) {
                     return true;
                 }
-                frontier.add(cloneGame);
+
+                normalizeState(cloneGame);
+
+                boolean inLoop=checkIfLoopQ(cloneGame, explored);
+                if (!inLoop) {
+                    frontier.add(cloneGame);
+                }
             }
-           /* if (x==0) {
-                notDone=false;
-            }*/
         } while (notDone);
-/*
-            if (gameStateSolved(nodeState)) {
-               return true;
-            }
-            else {
-               return false;
-            }
-*/
         return false;
-}
+    }
 
-    public static void depthFirstSearch() {}
+    // This is the DFS
+    //
+    public static boolean depthFirstSearch(Game g1, int moveNumber) {
+        String logInfo = "Solving game with DFS";
+        log("INFO", logInfo);
+        List<Move> listOfMoves = new ArrayList<Move>();
+        Game nodeState = cloneGameState(g1);
+        Deque<Game> frontier = new LinkedList<Game>();
+        Deque<Game> explored = new LinkedList<Game>();
 
+        ListIterator<Move> itr = listOfMoves.listIterator();
+
+        boolean notDone = true;
+
+        if (gameStateSolved(nodeState)) {
+            return true;
+        }
+
+        normalizeState(nodeState);
+        frontier.addFirst(nodeState);
+
+        do {
+            x--;
+            if (frontier.isEmpty()) {
+                return false;
+            }
+            Game newGame = frontier.removeFirst();
+            explored.addFirst(newGame);
+
+            //Game cloneGame = cloneGameState(newGame);
+
+            listOfMoves.clear();
+
+            allMoves(newGame, listOfMoves);
+            dumpMoves(listOfMoves);
+
+            for (Move newMove : listOfMoves) {
+                Game cloneGame = cloneGameState(newGame);
+
+                moveNumber++;
+                logInfo = "Move number " + moveNumber + ", Piece " + newMove.getPiece() + ", Direction=" + newMove.getDirection();
+                log("INFO", logInfo);
+
+                applyMove(cloneGame, newMove);
+                outputGameState(cloneGame);
+                if (gameStateSolved(cloneGame)) {
+                    return true;
+                }
+
+                normalizeState(cloneGame);
+
+                boolean inLoop=checkIfLoop(cloneGame, explored);
+
+                if (!inLoop) {
+                    frontier.addFirst(cloneGame);
+                }
+            }
+        } while (notDone);
+        return false;
+    }
+
+    // This function is used to make sure we are not in a loop in the BFS code.
+    //
+    public static boolean checkIfLoopQ(Game g1, Queue<Game> frontier){
+
+        boolean inLoop=false;
+
+        for (Game g: frontier){
+            if (stateEqual(g1, g)){
+                inLoop=true;
+            }
+        }
+        return inLoop;
+    }
+
+    // This function is used to make sure we are not in a loop in the DFS code.
+    //
+    public static boolean checkIfLoop(Game g1, Deque<Game> frontier){
+
+        boolean inLoop=false;
+
+        for (Game g: frontier){
+            if (stateEqual(g1, g)){
+                inLoop=true;
+            }
+        }
+        return inLoop;
+    }
+
+    // A simple logging function for use througout
+    //
     public static void log(String severity, String toPrint) {
 
         System.out.println("["+severity+"] "+toPrint);
 
     }
+
+    // This is my main, all driven from the command line.
+    //
     public static void main(String args[]) {
 
         System.out.println("Welcome to the Sliding Brick Puzzle Solver!");
@@ -815,8 +893,6 @@ public class Game {
         logInfo="Number of CMD line arguments="+args.length;
         int iterations=0;
 
-        //log("INFO", logInfo);
-        // Assume random search
         if ((args.length != 4) && (args.length != 3)) {
             System.out.println("Usage: java Game [game-name] [filename] [mode] [iterations]\n");
             System.out.println("             [game-name] is an arbitrary string to represent the name");
@@ -843,8 +919,6 @@ public class Game {
 
         // Load SBP-Level0.txt
         Game game = new Game(gameName, 0,0);
-        //myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        //fileName="SBP-level2.txt";
         loadGameState(game, fileName);
         outputGameState(game);
 
@@ -861,119 +935,20 @@ public class Game {
                          log("FAILURE", logInfo);
                      }
                     break;
+            case 3:  boolean dfssolution = depthFirstSearch(game, 1);
+                if (dfssolution) {
+                    logInfo = "Game Solved with DFS";
+                    log("SUCCESS", logInfo);
+                }
+                else {
+                    logInfo = "Game NOT solved with DFS";
+                    log("FAILURE", logInfo);
+                }
+                break;
             default:  log("ERROR", "Invalid game mode.");
                 break;
         }
 
         System.exit(0);
-
-        //int piece=3;
-        //System.out.println("Piece Width of piece="+piece+" is "+pieceWidth(level0,piece));
-        //System.out.println("Piece Height of piece="+piece+" is "+pieceHeight(level0,piece));
-/*
-        if (gameStateSolved(level0)) {
-            System.out.println("Game level0 is solved");
-        }
-        else {
-            System.out.println("Game level0 not solved");
-        }
-        Game level0Clone=cloneGameState(level0);
-        //outputGameState(level0Clone);
-        if(stateEqual(level0, level0Clone)) {
-            System.out.println("level0 and level0-clone are equal");
-        }
-        else {
-            System.out.println("level0 and level0-clone are NOT equal");
-        }
-
-
-        //prettyPrintGameState(level0);
-
-        // Load SBP-Level0-solved.txt
-        Game level0Solved = new Game("Level 0 Solved", 0,0);
-        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level0-solved.txt";
-        loadGameState(level0Solved, myPath, fileName);
-        //outputGameState(level0Solved);
-
-        if (gameStateSolved(level0Solved)) {
-            System.out.println("Game level0-solved is solved");
-        }
-        else {
-            System.out.println("Game level0-solved not solved");
-        }
-
-        //System.out.println("Move piece="+myMove.getPiece()+", Direction="+myMove.getDirection());
-*/
-/*
-        List<Move> listOfMoves=new ArrayList<Move>();
-        int piece=4;
-
-        allMovesHelp(level0, piece, listOfMoves);
-
-        allMoves(level0, listOfMoves);
-
-        System.out.println("Number of list items="+listOfMoves.size());
-
-        ListIterator<Move> itr=listOfMoves.listIterator();
-
-        while (itr.hasNext())
-        {
-            Move newMove=itr.next();
-            applyMove(level0, newMove);
-            outputGameState(level0);
-            System.out.println("Move piece="+newMove.getPiece()+", Direction="+newMove.getDirection());
-        }
-*/
-        /*
-        // Load SBP-Level1.txt
-        Game level1 = new Game("Level 1", 0, 0);
-        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level1.txt";
-        loadGameState(level1, myPath, fileName);
-        //outputGameState(level1);
-
-        if(stateEqual(level0, level1)) {
-            System.out.println("level0 and level1 are equal");
-        }
-        else {
-            System.out.println("level0 and level1 are NOT equal");
-        }
-
-        // Load SBP-Level2.txt
-        Game level2 = new Game("Level 2", 0, 0);
-        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level2.txt";
-        loadGameState(level2, myPath, fileName);
-        outputGameState(level2);
-
-        // Load SBP-Level3.txt
-        Game level3 = new Game("Level 3", 0, 0);
-        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-level3.txt";
-        loadGameState(level3, myPath, fileName);
-        outputGameState(level3);
-*/
-/*        // Load SBP-test-not-normalized.txt
-        Game notNormalized = new Game("Test Not Normalized", 0, 0);
-        myPath="C:/Users/dwhip_000/IdeaProjects//SBP/SBP/data/";
-        fileName="SBP-test-not-normalized.txt";
-        loadGameState(notNormalized, myPath, fileName);
-        outputGameState(notNormalized);
-
-        normalizeState(notNormalized);
-        outputGameState(notNormalized);
-
-        //prettyPrintGameState(notNormalized);
-*/
- /*System.out.print("Game name is ");
-        System.out.println(g1.getName());
-        System.out.print("Game width is ");
-        System.out.println(g1.getWidth());
-        System.out.print("Game heigth is ");
-        System.out.println(g1.getHeight());
-*/
-
-
     }
 }
